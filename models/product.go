@@ -22,7 +22,7 @@ var Products []Product
 
 // 新增商品
 func (product *Product) Insert() (err error) {
-	result := configDB.GormOpen.Create(&product)
+	result := configDB.GormOpen.Table("Products").Create(&product)
 
 	fmt.Println(product.Id)
 	if result.Error != nil {
@@ -35,7 +35,7 @@ func (product *Product) Insert() (err error) {
 // 查詢全部
 func (product *Product) GetProducts() (data interface{}, err error) {
 	var products []Product
-	result := configDB.GormOpen.Find(&products)
+	result := configDB.GormOpen.Table("Products").Find(&products)
 	if result.Error != nil {
 		err = result.Error
 		return "", err
@@ -46,10 +46,10 @@ func (product *Product) GetProducts() (data interface{}, err error) {
 // 修改商品
 func (product *Product) Update(id int64) (err error) {
 	var updateProduct Product
-	if err = configDB.GormOpen.Select([]string{"id"}).First(&updateProduct, id).Error; err != nil {
+	if err = configDB.GormOpen.Table("Products").Select([]string{"id"}).First(&updateProduct, id).Error; err != nil {
 		return err
 	}
-	if err = configDB.GormOpen.Model(&updateProduct).Updates(&product).Error; err != nil {
+	if err = configDB.GormOpen.Table("Products").Model(&updateProduct).Updates(&product).Error; err != nil {
 		return err
 	}
 	return nil
@@ -58,11 +58,11 @@ func (product *Product) Update(id int64) (err error) {
 // 刪除商品
 func (product *Product) Destroy(id int64) (err error) {
 
-	if err = configDB.GormOpen.Select([]string{"id"}).First(&product, id).Error; err != nil {
+	if err = configDB.GormOpen.Table("Products").Select([]string{"id"}).First(&product, id).Error; err != nil {
 		return err
 	}
 
-	if err = configDB.GormOpen.Delete(&product).Error; err != nil {
+	if err = configDB.GormOpen.Table("Products").Delete(&product).Error; err != nil {
 		return err
 	}
 	return nil
@@ -72,7 +72,7 @@ func (product *Product) Destroy(id int64) (err error) {
 func (product *Product) GetProductImg(id int64) (imgName string, err error) {
 
 	var productRow Product
-	configDB.GormOpen.Table("products").Where("id=?", id).Scan(&productRow)
+	configDB.GormOpen.Table("Products").Where("id=?", id).Scan(&productRow)
 
 	result := productRow.Img
 	if len(result) > 0 {

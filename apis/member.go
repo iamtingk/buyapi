@@ -28,7 +28,7 @@ func MemberSignUp(c *gin.Context) {
 		if IsEmail(member.Email) && IsPhone(member.Phone) {
 
 			// 執行-增加會員
-			result, err := member.Insert()
+			result, err := member.Insert(member.Email)
 			if err != nil {
 				// 註冊失敗
 				ShowJsonMSG(c, code.ERROR, msg.SIGNUP_ERROR)

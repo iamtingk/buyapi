@@ -1,7 +1,9 @@
 package models
 
 import (
+	msg "buyapi/config"
 	configDB "buyapi/database"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -23,9 +25,13 @@ type ShowToken struct {
 }
 
 // 註冊會員
-func (member *Member) Insert() (data *Member, err error) {
-	if err := configDB.GormOpen.Create(&member).Error; err != nil {
-		return member, err
+func (member *Member) Insert(email string) (data *Member, err error) {
+	if isMemberReport(email) {
+		return nil, errors.New(msg.SIGNUP_ERROR)
+	}
+
+	if err := configDB.GormOpen.Table("Members").Create(&member).Error; err != nil {
+		return nil, errors.New(msg.SIGNUP_ERROR)
 	}
 	fmt.Println(member.Email)
 	return member, nil
@@ -33,8 +39,22 @@ func (member *Member) Insert() (data *Member, err error) {
 
 // 登入會員
 func (member *Member) Query(email string, password string) (data *Member, err error) {
-	if err := configDB.GormOpen.Table("members").Where("email=? AND password=?", email, password).Scan(&member).Error; err != nil {
+	if err := configDB.GormOpen.Table("Members").Where("email=? AND password=?", email, password).Scan(&member).Error; err != nil {
 		return member, err
 	}
 	return member, nil
+}
+
+// 查詢重複會員,true：重複
+func isMemberReport(email string) (b bool) {
+	var memberVerify Member
+	configDB.GormOpen.Table("Members").Where("email=?", email).Scan(&memberVerify)
+	result := memberVerify.Email
+
+	if len(result) > 0 {
+		fmt.Println("2")
+		return true
+	}
+
+	return false
 }
