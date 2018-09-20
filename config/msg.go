@@ -2,6 +2,7 @@ package config
 
 const (
 	WRITE_ERROR              = "寫入失敗"
+	VERIFY_ERROR             = "驗證失敗"
 	WRITE_FILE_ERROR         = "寫入檔案失敗"
 	ARGS_ERROR               = "參數錯誤"
 	CREATE_SUCCESS           = "新增成功"

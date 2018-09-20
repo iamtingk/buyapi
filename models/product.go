@@ -4,11 +4,12 @@ import (
 	msg "buyapi/config"
 	configDB "buyapi/database"
 	"errors"
+	"fmt"
 	"time"
 )
 
 type Product struct {
-	ID        int64     `json:"id"`        // 商品Id
+	Id        int64     `json:"id"`        // 商品Id
 	Name      string    `json:"name"`      // 商品名稱
 	Img       string    `json:"img"`       // 圖片
 	Price     string    `json:"price"`     // 價錢
@@ -22,6 +23,8 @@ var Products []Product
 // 新增商品
 func (product Product) Insert() (err error) {
 	result := configDB.GormOpen.Create(&product)
+
+	fmt.Println(product.Id)
 	if result.Error != nil {
 		err = result.Error
 		return err
