@@ -114,7 +114,7 @@ func UpdateProduct(c *gin.Context) {
 		product.Img = fileRename(filename)
 
 		// 寫入資料
-		_, err = product.Update(id)
+		err = product.Update(id)
 		if err != nil {
 			//如果出錯，就刪除剛存的圖片
 			os.Remove(config.IMAGE_PATH + product.Img)

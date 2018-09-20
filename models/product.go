@@ -41,15 +41,15 @@ func (product *Product) GetProducts() (data interface{}, err error) {
 }
 
 // 修改商品
-func (product *Product) Update(id int64) (updateProduct Product, err error) {
-
+func (product *Product) Update(id int64) (err error) {
+	var updateProduct Product
 	if err = configDB.GormOpen.Select([]string{"id"}).First(&updateProduct, id).Error; err != nil {
-		return
+		return err
 	}
 	if err = configDB.GormOpen.Model(&updateProduct).Updates(&product).Error; err != nil {
-		return
+		return err
 	}
-	return
+	return nil
 }
 
 // 查詢圖片名稱 - 指定id
