@@ -18,14 +18,23 @@ type Member struct {
 	UpdatedAt     time.Time `json:"updatedAt"`       // 更新時間
 }
 
-// 新增商品
-func (member *Member) Insert() (err error) {
-	result := configDB.GormOpen.Create(&member)
+type ShowToken struct {
+	Token string `json:"token"` // token憑證
+}
 
-	fmt.Println(member.Id)
-	if result.Error != nil {
-		err = result.Error
-		return err
+// 註冊會員
+func (member *Member) Insert() (data *Member, err error) {
+	if err := configDB.GormOpen.Create(&member).Error; err != nil {
+		return member, err
 	}
-	return nil
+	fmt.Println(member.Email)
+	return member, nil
+}
+
+// 登入會員
+func (member *Member) Query(email string, password string) (data *Member, err error) {
+	if err := configDB.GormOpen.Table("members").Where("email=? AND password=?", email, password).Scan(&member).Error; err != nil {
+		return member, err
+	}
+	return member, nil
 }

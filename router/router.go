@@ -23,7 +23,8 @@ func InitRouter() *gin.Engine {
 	router.PUT("/product/:id", UpdateProduct)
 	router.DELETE("/product/:id", DestroyProduct)
 
-	router.POST("/member", SignUpMember)
+	router.POST("/member/signup", MemberSignUp)
+	router.POST("/member/signin", MemberSignIn)
 
 	router.Static("/image", config.IMAGE_PATH)
 

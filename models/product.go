@@ -21,7 +21,7 @@ type Product struct {
 var Products []Product
 
 // 新增商品
-func (product Product) Insert() (err error) {
+func (product *Product) Insert() (err error) {
 	result := configDB.GormOpen.Create(&product)
 
 	fmt.Println(product.Id)

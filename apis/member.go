@@ -5,14 +5,13 @@ import (
 	msg "buyapi/config"
 	model "buyapi/models"
 	. "buyapi/utils"
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// 增加商品
-func SignUpMember(c *gin.Context) {
+// 會員註冊
+func MemberSignUp(c *gin.Context) {
 	var member model.Member
 
 	// 取得參數
@@ -21,24 +20,63 @@ func SignUpMember(c *gin.Context) {
 	member.Password = c.Request.FormValue("password")
 	member.CreatedAt = time.Now()
 	member.UpdatedAt = time.Now()
-	fmt.Println(member.Email)
-	fmt.Println(member.Phone)
-	fmt.Println(member.Password)
+	member.Token = GetToken()
 
 	// 參數是否有值
 	if len(member.Email) > 0 && len(member.Phone) > 0 && len(member.Password) > 0 {
-		fmt.Println("OK")
 		// 驗證規則
 		if IsEmail(member.Email) && IsPhone(member.Phone) {
 
 			// 執行-增加會員
-			err := member.Insert()
+			result, err := member.Insert()
 			if err != nil {
-				// 新增失敗
-				ShowJsonMSG(c, code.ERROR, msg.WRITE_ERROR)
+				// 註冊失敗
+				ShowJsonMSG(c, code.ERROR, msg.SIGNUP_ERROR)
 				return
 			}
-			ShowJsonDATA(c, code.SUCCESS, msg.CREATE_SUCCESS, "")
+			// var showtoken model.ShowToken
+			// showtoken.Token = member.Token
+			// 註冊成功
+			ShowJsonDATA(c, code.SUCCESS, msg.SIGNUP_SUCCESS, result)
+		} else {
+			// 驗證失敗
+			ShowJsonMSG(c, code.ERROR, msg.VERIFY_ERROR)
+			return
+		}
+
+	} else {
+		// 缺少參數
+		ShowJsonMSG(c, code.ERROR, msg.ARGS_ERROR)
+		return
+	}
+
+}
+
+// 會員登入
+func MemberSignIn(c *gin.Context) {
+	var member model.Member
+
+	// 取得參數
+	member.Email = c.Request.FormValue("email")
+	member.Password = c.Request.FormValue("password")
+
+	// 參數是否有值
+	if len(member.Email) > 0 && len(member.Password) > 0 {
+		// 驗證規則
+		if IsEmail(member.Email) {
+
+			// 執行-增加會員
+			result, err := member.Query(member.Email, member.Password)
+			if err != nil {
+				// 登入失敗
+				ShowJsonMSG(c, code.ERROR, msg.SIGNIN_ERROR)
+				return
+			}
+
+			// var showtoken model.ShowToken
+			// showtoken.Token = GetToken()
+
+			ShowJsonDATA(c, code.SUCCESS, msg.SIGNIN_SUCCESS, result)
 		} else {
 			// 驗證失敗
 			ShowJsonMSG(c, code.ERROR, msg.VERIFY_ERROR)
