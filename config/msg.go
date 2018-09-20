@@ -7,6 +7,8 @@ const (
 	CREATE_SUCCESS           = "新增成功"
 	UPDATE_SUCCESS           = "修改成功"
 	DELETE_IMG_ERROR         = "刪除圖檔出錯"
+	DELETE_ERROR             = "刪除失敗"
+	DELETE_SUCCESS           = "刪除成功"
 	NOT_FOUND_IMAGE_FOLDER   = "沒有image資料夾"
 	NOT_FOUND_IMAGE          = "找不到圖片"
 	RENAME_ERROR             = "重新命名錯誤"

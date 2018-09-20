@@ -1,7 +1,5 @@
 package apis
 
-// 圖片
-// 修改商品
 import (
 	code "buyapi/config"
 	config "buyapi/config"
@@ -18,9 +16,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Products(c *gin.Context) {
+// 展示全部商品
+func ShowProducts(c *gin.Context) {
 	var product model.Product
 
+	// 執行-查詢全部商品
 	result, err := product.GetProducts()
 
 	if err != nil {
@@ -60,7 +60,7 @@ func CreateProduct(c *gin.Context) {
 		//圖檔重新命名
 		product.Img = fileRename(filename)
 
-		// 寫入資料
+		// 執行-增加商品
 		err := product.Insert()
 		if err != nil {
 			//如果出錯，就刪除剛存的圖片
@@ -103,7 +103,7 @@ func UpdateProduct(c *gin.Context) {
 			return
 		}
 
-		// 取得原本圖檔的名稱
+		// 執行-查詢原本圖檔的名稱
 		oldImgName, err := product.GetProductImg(id)
 		if err != nil {
 			//找不到圖片刪除，仍繼續
@@ -113,7 +113,7 @@ func UpdateProduct(c *gin.Context) {
 		//圖檔重新命名
 		product.Img = fileRename(filename)
 
-		// 寫入資料
+		// 執行-修改商品
 		err = product.Update(id)
 		if err != nil {
 			//如果出錯，就刪除剛存的圖片
@@ -138,6 +138,37 @@ func UpdateProduct(c *gin.Context) {
 		showJsonMSG(c, code.ERROR, msg.ARGS_ERROR)
 		return
 	}
+
+}
+
+//刪除商品
+func DestroyProduct(c *gin.Context) {
+	var product model.Product
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	// 執行-查詢原本圖檔的名稱
+	oldImgName, err := product.GetProductImg(id)
+	if err != nil {
+		//找不到圖片刪除，仍繼續
+		fmt.Println(err)
+	}
+
+	// 執行-刪除商品
+	err = product.Destroy(id)
+	if err != nil {
+		//刪除失敗
+		showJsonMSG(c, code.ERROR, msg.DELETE_ERROR)
+		return
+	}
+
+	// 刪除原本照片
+	err = os.Remove(config.IMAGE_PATH + oldImgName)
+	if err != nil {
+		// 找不到圖片刪除，仍繼續
+		fmt.Println(msg.CONTINUE_NOT_FOUND_IMAGE)
+	}
+
+	showJsonDATA(c, code.SUCCESS, msg.DELETE_SUCCESS, "")
 
 }
 

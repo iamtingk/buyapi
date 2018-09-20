@@ -52,6 +52,19 @@ func (product *Product) Update(id int64) (err error) {
 	return nil
 }
 
+// 刪除商品
+func (product *Product) Destroy(id int64) (err error) {
+
+	if err = configDB.GormOpen.Select([]string{"id"}).First(&product, id).Error; err != nil {
+		return err
+	}
+
+	if err = configDB.GormOpen.Delete(&product).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 // 查詢圖片名稱 - 指定id
 func (product *Product) GetProductImg(id int64) (imgName string, err error) {
 
