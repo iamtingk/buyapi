@@ -24,7 +24,7 @@ func Products(c *gin.Context) {
 	result, err := product.GetProducts()
 
 	if err != nil {
-		showJsonMSG(c, code.ERROR, msg.NOT_FOUND_ERROR)
+		showJsonMSG(c, code.ERROR, msg.NOT_FOUND_DATA_ERROR)
 		return
 	}
 	showJsonDATA(c, code.SUCCESS, msg.EXEC_SUCCESS, result)
@@ -98,17 +98,15 @@ func UpdateProduct(c *gin.Context) {
 	if len(product.Name) > 0 && len(product.Price) > 0 {
 		filename := header.Filename
 		if file == nil && len(filename) <= 0 {
-			//沒有圖片
-			fmt.Println(msg.NOT_FOUND_IMAGE, err)
+			//找不到圖片
 			showJsonMSG(c, code.ERROR, msg.NOT_FOUND_IMAGE)
 			return
 		}
 
 		// 取得原本圖檔的名稱
 		oldImgName, err := product.GetProductImg(id)
-		fmt.Println("oldImgName:" + oldImgName)
 		if err != nil {
-			//無圖片可刪除
+			//找不到圖片刪除，仍繼續
 			fmt.Println(err)
 		}
 
@@ -123,8 +121,13 @@ func UpdateProduct(c *gin.Context) {
 			showJsonMSG(c, code.ERROR, msg.WRITE_ERROR)
 			return
 		}
+
 		//刪除原本照片
-		os.Remove(config.IMAGE_PATH + oldImgName)
+		err = os.Remove(config.IMAGE_PATH + oldImgName)
+		if err != nil {
+			//找不到圖片刪除，仍繼續
+			fmt.Println(msg.CONTINUE_NOT_FOUND_IMAGE)
+		}
 
 		// 新增圖片
 		AddImg(c, file, product.Img, config.IMAGE_PATH)
@@ -132,7 +135,6 @@ func UpdateProduct(c *gin.Context) {
 		showJsonDATA(c, code.SUCCESS, msg.UPDATE_SUCCESS, "")
 
 	} else {
-		fmt.Println("GGGG3")
 		showJsonMSG(c, code.ERROR, msg.ARGS_ERROR)
 		return
 	}
@@ -141,18 +143,13 @@ func UpdateProduct(c *gin.Context) {
 
 func fileRename(filename string) string {
 	// 替換圖片檔名
-
 	newFileName := GetMD5Hash(filename + time.Now().String())
 	dotIndex := strings.LastIndex(filename, ".") //取得最後的.的索引值
 	if dotIndex != -1 && dotIndex != 0 {
 		newFileName += filename[dotIndex:] //取得副檔名
 	}
-	err := os.Rename(config.IMAGE_PATH+filename, config.IMAGE_PATH+newFileName)
-	//Rename(oldName,newName)
-	if err != nil {
-		// 重新命名錯誤
-		fmt.Println(msg.RENAME_ERROR, err)
-	}
+	//輸出 檔名＋副檔名
+
 	return newFileName
 }
 

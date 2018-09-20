@@ -1,9 +1,9 @@
 package models
 
 import (
+	msg "buyapi/config"
 	configDB "buyapi/database"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -37,7 +37,7 @@ func (product *Product) GetProducts() (data interface{}, err error) {
 		err = result.Error
 		return "", err
 	}
-	return result, err
+	return products, nil
 }
 
 // 修改商品
@@ -52,19 +52,17 @@ func (product *Product) Update(id int64) (updateProduct Product, err error) {
 	return
 }
 
-// 查詢圖檔
+// 查詢圖片名稱 - 指定id
 func (product *Product) GetProductImg(id int64) (imgName string, err error) {
 
 	var productRow Product
 	configDB.GormOpen.Table("products").Where("id=?", id).Scan(&productRow)
-
-	fmt.Println(productRow.Img)
 
 	result := productRow.Img
 	if len(result) > 0 {
 		return result, nil
 	}
 
-	return result, errors.New("圖片沒有找到")
+	return result, errors.New(msg.CONTINUE_NOT_FOUND_IMAGE)
 
 }
