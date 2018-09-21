@@ -5,7 +5,6 @@ import (
 	configDB "buyapi/database"
 	"errors"
 	"fmt"
-	"reflect"
 	"time"
 )
 
@@ -56,8 +55,7 @@ func QueryOrderDetail(orderId int64) (data interface{}, err error) {
 	} else if len(orderDetail[0:]) == 0 {
 		return nil, errors.New(msg.NOT_FOUND_DATA_ERROR)
 	}
-	fmt.Println(reflect.TypeOf(result))
-	fmt.Println(reflect.TypeOf(orderDetail))
+
 	return orderDetail, nil
 }
 
@@ -106,14 +104,28 @@ func InsertOrderdetail(detailsInfo []OrderDetail) (err error) {
 }
 
 // 刪除訂單
-func (product *Product) Destroy(id int64) (err error) {
+func (order *Order) Destroy(order_id int64) (err error) {
 
-	if err = configDB.GormOpen.Table("Products").Select([]string{"id"}).First(&product, id).Error; err != nil {
+	var tmpOrder Order
+	var tmpOrderDetail OrderDetail
+	if err = configDB.GormOpen.Table("Orders").Select([]string{"id"}).First(&tmpOrder, order_id).Error; err != nil {
+		fmt.Println("111")
 		return err
 	}
 
-	if err = configDB.GormOpen.Table("Products").Delete(&product).Error; err != nil {
+	if err = configDB.GormOpen.Table("OrderDetails").Select([]string{"order_id"}).First(&tmpOrderDetail, order_id).Error; err != nil {
+		fmt.Println("222")
 		return err
 	}
+
+	fmt.Println(order_id)
+	if err = configDB.GormOpen.Table("Orders").Where("id=?", order_id).Delete(&tmpOrder).Error; err != nil {
+		return err
+	}
+
+	if err = configDB.GormOpen.Table("OrderDetails").Where("order_id=?", order_id).Delete(&tmpOrderDetail).Error; err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -30,6 +30,7 @@ func InitRouter() *gin.Engine {
 	router.POST("/order/create", CreateOrder)
 	router.POST("/order/query", ShowOrders)
 	router.POST("/order/querydetail", ShowOrderDetail)
+	router.DELETE("/order/delete", DeleteOrder)
 
 	router.Static("/image", config.IMAGE_PATH)
 

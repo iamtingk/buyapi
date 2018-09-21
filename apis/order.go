@@ -154,3 +154,18 @@ func CreateOrder(c *gin.Context) {
 	ShowJsonDATA(c, code.SUCCESS, msg.CREATE_SUCCESS, "")
 
 }
+
+func DeleteOrder(c *gin.Context) {
+	var order model.Order
+	order_id, err := strconv.ParseInt(c.Request.FormValue("order_id"), 10, 64)
+
+	// 執行-刪除商品
+	err = order.Destroy(order_id)
+	if err != nil {
+		//刪除失敗
+		ShowJsonMSG(c, code.ERROR, msg.DELETE_ERROR)
+		return
+	}
+
+	ShowJsonDATA(c, code.SUCCESS, msg.DELETE_SUCCESS, "")
+}
