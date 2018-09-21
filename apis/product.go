@@ -21,7 +21,7 @@ func ShowProducts(c *gin.Context) {
 	var product model.Product
 
 	// 執行-查詢全部商品
-	result, err := product.GetProducts()
+	result, err := product.QueryProducts()
 
 	if err != nil {
 		ShowJsonMSG(c, code.ERROR, msg.NOT_FOUND_DATA_ERROR)

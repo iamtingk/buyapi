@@ -5,6 +5,7 @@ import (
 	configDB "buyapi/database"
 	"errors"
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -32,6 +33,35 @@ type OrderDetail struct {
 	Num       int64 `json:"num"`        // 數量
 }
 
+// 查詢全部
+func (order *Order) QueryOrders(memberId int64) (data interface{}, err error) {
+	var orders []Order
+	result := configDB.GormOpen.Table("Orders").Where("member_id=?", memberId).Find(&orders)
+	if result.Error != nil {
+		err = result.Error
+		return nil, err
+	} else if len(orders[0:]) == 0 {
+		return nil, errors.New(msg.NOT_FOUND_DATA_ERROR)
+	}
+	return orders, nil
+}
+
+// 查詢訂單明細
+func QueryOrderDetail(orderId int64) (data interface{}, err error) {
+	var orderDetail []OrderDetail
+	result := configDB.GormOpen.Table("OrderDetails").Where("order_id=?", orderId).Find(&orderDetail)
+	if result.Error != nil {
+		err = result.Error
+		return nil, err
+	} else if len(orderDetail[0:]) == 0 {
+		return nil, errors.New(msg.NOT_FOUND_DATA_ERROR)
+	}
+	fmt.Println(reflect.TypeOf(result))
+	fmt.Println(reflect.TypeOf(orderDetail))
+	return orderDetail, nil
+}
+
+// 新增訂單
 func (order *Order) InsertOrder(orderInfo Order, detailsInfo []OrderDetail) (data *Order, err error) {
 	if err := configDB.GormOpen.Table("Orders").Create(&orderInfo).Error; err != nil {
 		return nil, errors.New(msg.SQL_WRITE_ERROR)
@@ -51,6 +81,7 @@ func (order *Order) InsertOrder(orderInfo Order, detailsInfo []OrderDetail) (dat
 	return &orderInfo, nil
 }
 
+//新增訂單明細
 func InsertOrderdetail(detailsInfo []OrderDetail) (err error) {
 	sql := "INSERT INTO `OrderDetails` (`order_id`,`product_id`,`num`) VALUES "
 	count := len(detailsInfo[0:]) - 1
@@ -71,5 +102,18 @@ func InsertOrderdetail(detailsInfo []OrderDetail) (err error) {
 	}
 
 	tx.Commit()
+	return nil
+}
+
+// 刪除訂單
+func (product *Product) Destroy(id int64) (err error) {
+
+	if err = configDB.GormOpen.Table("Products").Select([]string{"id"}).First(&product, id).Error; err != nil {
+		return err
+	}
+
+	if err = configDB.GormOpen.Table("Products").Delete(&product).Error; err != nil {
+		return err
+	}
 	return nil
 }

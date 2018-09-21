@@ -33,12 +33,14 @@ func (product *Product) Insert() (err error) {
 }
 
 // 查詢全部
-func (product *Product) GetProducts() (data interface{}, err error) {
+func (product *Product) QueryProducts() (data interface{}, err error) {
 	var products []Product
 	result := configDB.GormOpen.Table("Products").Find(&products)
 	if result.Error != nil {
 		err = result.Error
 		return "", err
+	} else if len(products[0:]) == 0 {
+		return nil, errors.New(msg.NOT_FOUND_DATA_ERROR)
 	}
 	return products, nil
 }
