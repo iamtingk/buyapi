@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -65,4 +67,11 @@ func GetToken() string {
 
 	}
 	return tokenString
+}
+
+// MD5生成
+func GetMD5Hash(text string) string {
+	haser := md5.New()
+	haser.Write([]byte(text))
+	return hex.EncodeToString(haser.Sum(nil))
 }
