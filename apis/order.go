@@ -75,7 +75,7 @@ func CreateOrder(c *gin.Context) {
 	orderDetails = tmp
 
 	// 執行-新增訂單
-	result, err := order.CreateOrder(order, orderDetails)
+	result, err := order.InsertOrder(order, orderDetails)
 	fmt.Println(result) // id
 	if err != nil {
 		// 註冊失敗

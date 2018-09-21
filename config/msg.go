@@ -22,4 +22,5 @@ const (
 	REQUEST_DATA_ERROR       = "資料回傳錯誤"
 	EXEC_SUCCESS             = "執行正常"
 	CONTINUE_NOT_FOUND_IMAGE = "圖片沒有找到,仍繼續執行"
+	SQL_WRITE_ERROR          = "資料寫入異常"
 )

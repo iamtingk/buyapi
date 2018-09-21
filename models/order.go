@@ -32,35 +32,42 @@ type OrderDetail struct {
 	Num       int64 `json:"num"`        // 數量
 }
 
-func (order *Order) CreateOrder(orderInfo Order, detailsInfo []OrderDetail) (data *Order, err error) {
-
+func (order *Order) InsertOrder(orderInfo Order, detailsInfo []OrderDetail) (data *Order, err error) {
 	if err := configDB.GormOpen.Table("Orders").Create(&orderInfo).Error; err != nil {
 		return nil, errors.New(msg.SIGNUP_ERROR)
 	}
 
-	detailsInfo[0].OrderId = orderInfo.Id
-	// for i, _ := range detailsInfo {
-	// 	detailsInfo[i].OrderId = orderInfo.Id
-	// }
-	fmt.Println(detailsInfo[0].OrderId)
-	// // var orderDetail OrderDetail
+	for i, _ := range detailsInfo {
+		detailsInfo[i].OrderId = orderInfo.Id
+	}
 
-	// tmp := make([]OrderDetail, len(detailsInfo))
-	// for i, detail := range detailsInfo {
-	// 	tmp[i].Id = orderInfo.Id
-	// 	tmp[i].Num = detail.Num
-	// 	tmp[i].ProductId = detail.ProductId
-	// }
-
+	//新增訂單明細
+	if err := InsertOrderdetail(detailsInfo){
+		return nil, errors.New(msg.SQL_WRITE_ERROR)
+	}
+	
 	return &orderInfo, nil
 }
 
-func (orderDetail *OrderDetail) CreateOrderdetail(orderDetailInfo *OrderDetail) (data *OrderDetail, err error) {
-
-	if err := configDB.GormOpen.Table("OrderDetails").Create(&orderDetailInfo).Error; err != nil {
-		return nil, errors.New(msg.SIGNUP_ERROR)
+func InsertOrderdetail(detailsInfo []OrderDetail) (err error) {
+	sql := "INSERT INTO `OrderDetails` (`order_id`,`product_id`,`num`) VALUES "
+	count := len(detailsInfo[0:]) - 1
+	for i, detail := range detailsInfo {
+		if i == (count) {
+			sql += fmt.Sprintf("('%d','%d','%d');", detail.OrderId, detail.ProductId, detail.Num)
+		} else {
+			sql += fmt.Sprintf("('%d','%d','%d'),", detail.OrderId, detail.ProductId, detail.Num)
+		}
 	}
-	fmt.Println(orderDetailInfo.OrderId)
+	fmt.Println(sql)
 
-	return orderDetailInfo, nil
+	tx := configDB.GormOpen.Begin()
+
+	if err := configDB.GormOpen.Exec(sql).Error; err != nil {
+		tx.Rollback()
+		return errors.New(msg.SQL_WRITE_ERROR)
+	}
+
+	tx.Commit()
+	return nil
 }
