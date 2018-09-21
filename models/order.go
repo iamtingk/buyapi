@@ -34,18 +34,20 @@ type OrderDetail struct {
 
 func (order *Order) InsertOrder(orderInfo Order, detailsInfo []OrderDetail) (data *Order, err error) {
 	if err := configDB.GormOpen.Table("Orders").Create(&orderInfo).Error; err != nil {
-		return nil, errors.New(msg.SIGNUP_ERROR)
+		return nil, errors.New(msg.SQL_WRITE_ERROR)
 	}
 
+	// 設置訂單明細OrderId
 	for i, _ := range detailsInfo {
 		detailsInfo[i].OrderId = orderInfo.Id
 	}
 
 	//新增訂單明細
-	if err := InsertOrderdetail(detailsInfo){
+	if err := InsertOrderdetail(detailsInfo); err != nil {
+		fmt.Println("332211")
 		return nil, errors.New(msg.SQL_WRITE_ERROR)
 	}
-	
+
 	return &orderInfo, nil
 }
 
