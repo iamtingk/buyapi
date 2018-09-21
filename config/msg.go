@@ -5,6 +5,7 @@ const (
 	VERIFY_ERROR             = "驗證失敗"
 	SIGNIN_ERROR             = "登入失敗"
 	SIGNIN_SUCCESS           = "登入成功"
+	NOT_SIGNIN               = "未登入"
 	SIGNUP_ERROR             = "註冊失敗"
 	SIGNUP_SUCCESS           = "註冊成功"
 	WRITE_FILE_ERROR         = "寫入檔案失敗"
@@ -18,6 +19,7 @@ const (
 	NOT_FOUND_IMAGE          = "找不到圖片"
 	RENAME_ERROR             = "重新命名錯誤"
 	NOT_FOUND_DATA_ERROR     = "找不到任何資訊"
+	REQUEST_DATA_ERROR       = "資料回傳錯誤"
 	EXEC_SUCCESS             = "執行正常"
 	CONTINUE_NOT_FOUND_IMAGE = "圖片沒有找到,仍繼續執行"
 )

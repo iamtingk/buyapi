@@ -26,6 +26,9 @@ func InitRouter() *gin.Engine {
 	router.POST("/member/signup", MemberSignUp)
 	router.POST("/member/signin", MemberSignIn)
 
+	router.POST("/test", TestOrder)
+	router.POST("/order/create", CreateOrder)
+
 	router.Static("/image", config.IMAGE_PATH)
 
 	return router

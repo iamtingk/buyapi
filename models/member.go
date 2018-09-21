@@ -58,3 +58,14 @@ func isMemberReport(email string) (b bool) {
 
 	return false
 }
+
+// 檢查Token
+func CheckToken(token string) (memberId int64, err error) {
+	var member Member
+	configDB.GormOpen.Table("Members").Where("token=?", token).Select([]string{"id , email"}).Scan(&member)
+	memberId = member.Id
+	if memberId <= 0 {
+		return memberId, errors.New(msg.NOT_SIGNIN)
+	}
+	return memberId, nil
+}
