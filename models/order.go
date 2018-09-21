@@ -105,20 +105,16 @@ func InsertOrderdetail(detailsInfo []OrderDetail) (err error) {
 
 // 刪除訂單
 func (order *Order) Destroy(order_id int64) (err error) {
-
 	var tmpOrder Order
-	var tmpOrderDetail OrderDetail
-	if err = configDB.GormOpen.Table("Orders").Select([]string{"id"}).First(&tmpOrder, order_id).Error; err != nil {
-		fmt.Println("111")
+	var tmpOrderDetail []OrderDetail
+	if err = configDB.GormOpen.Table("Orders").Where("id=?", order_id).First(&tmpOrder, order_id).Error; err != nil {
 		return err
 	}
 
-	if err = configDB.GormOpen.Table("OrderDetails").Select([]string{"order_id"}).First(&tmpOrderDetail, order_id).Error; err != nil {
-		fmt.Println("222")
+	if err = configDB.GormOpen.Table("OrderDetails").Where("order_id=?", order_id).Find(&tmpOrderDetail, order_id).Error; err != nil {
 		return err
 	}
 
-	fmt.Println(order_id)
 	if err = configDB.GormOpen.Table("Orders").Where("id=?", order_id).Delete(&tmpOrder).Error; err != nil {
 		return err
 	}
@@ -126,6 +122,5 @@ func (order *Order) Destroy(order_id int64) (err error) {
 	if err = configDB.GormOpen.Table("OrderDetails").Where("order_id=?", order_id).Delete(&tmpOrderDetail).Error; err != nil {
 		return err
 	}
-
 	return nil
 }

@@ -80,31 +80,6 @@ func ShowOrderDetail(c *gin.Context) {
 }
 
 // 增加訂單
-func TestOrder(c *gin.Context) {
-
-	type Pig struct {
-		Head string `json:"head"`
-		Num  int64  `json:"num"`
-	}
-
-	type KDRespBody struct {
-		Text []Pig `json:"pig"`
-		Num  int64 `json:"num"`
-	}
-
-	var abc KDRespBody
-	err := c.BindJSON(&abc)
-	if err != nil {
-		fmt.Println("errKKKK")
-	}
-	fmt.Println(abc.Text)
-	fmt.Println(len(abc.Text))
-	fmt.Println(abc.Text[1])
-	fmt.Println(abc.Text[2].Head)
-
-}
-
-// 增加訂單
 func CreateOrder(c *gin.Context) {
 
 	var request model.RequestOrder
