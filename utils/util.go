@@ -5,6 +5,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -74,4 +77,25 @@ func GetMD5Hash(text string) string {
 	haser := md5.New()
 	haser.Write([]byte(text))
 	return hex.EncodeToString(haser.Sum(nil))
+}
+
+// 判斷資料夾是否存在
+func IsExists(path string) bool {
+	_, err := os.Stat(path) //os.Stat獲得資料夾訊息
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		return false
+	}
+	return true
+}
+
+// 取得執行檔當前路徑，go run 無作用
+func GetAppPath() string {
+	file, _ := exec.LookPath(os.Args[0])
+	path, _ := filepath.Abs(file)
+	index := strings.LastIndex(path, string(os.PathSeparator))
+
+	return path[:index]
 }

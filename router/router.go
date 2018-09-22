@@ -3,6 +3,7 @@ package router
 import (
 	. "buyapi/apis"
 	"buyapi/config"
+	. "buyapi/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +24,12 @@ func InitRouter() *gin.Engine {
 	router.POST("/order/querydetail", ShowOrderDetail)
 	router.DELETE("/order/delete", DeleteOrder)
 
-	router.Static("/image", config.IMAGE_PATH)
+	//  ---訪問圖片---
+	// go run 使用
+	// router.Static("/image", config.IMAGE_PATH)
+
+	//  go build 使用
+	router.Static("/image", GetAppPath()+config.IMAGE_PATH2)
 
 	return router
 }

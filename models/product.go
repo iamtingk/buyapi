@@ -4,7 +4,6 @@ import (
 	msg "buyapi/config"
 	configDB "buyapi/database"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -24,7 +23,6 @@ var Products []Product
 func (product *Product) Insert() (err error) {
 	result := configDB.GormOpen.Table("Products").Create(&product)
 
-	fmt.Println(product.Id)
 	if result.Error != nil {
 		err = result.Error
 		return err

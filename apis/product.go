@@ -6,6 +6,7 @@ import (
 	msg "buyapi/config"
 	model "buyapi/models"
 	. "buyapi/utils"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -69,7 +70,10 @@ func CreateProduct(c *gin.Context) {
 			return
 		}
 		// 新增圖片
-		addImg(c, file, product.Img, config.IMAGE_PATH)
+		err = addImg(c, file, product.Img, config.IMAGE_PATH)
+		if err != nil {
+			ShowJsonMSG(c, code.ERROR, msg.ADD_IMAGE_ERROR)
+		}
 
 		ShowJsonDATA(c, code.SUCCESS, msg.CREATE_SUCCESS, "")
 
@@ -131,7 +135,10 @@ func UpdateProduct(c *gin.Context) {
 		}
 
 		// 新增圖片
-		addImg(c, file, product.Img, config.IMAGE_PATH)
+		err = addImg(c, file, product.Img, config.IMAGE_PATH)
+		if err != nil {
+			ShowJsonMSG(c, code.ERROR, msg.ADD_IMAGE_ERROR)
+		}
 
 		ShowJsonDATA(c, code.SUCCESS, msg.UPDATE_SUCCESS, "")
 
@@ -186,19 +193,40 @@ func fileRename(filename string) string {
 	return newFileName
 }
 
-func addImg(c *gin.Context, file io.Reader, fileName string, filePath string) {
+func addImg(c *gin.Context, file io.Reader, fileName string, filePath string) error {
+
+	//  ---當前路徑---go build 使用
+	//  產生image資料夾的路徑
+	filePath = GetAppPath() + config.IMAGE_PATH2
+
+	//  ---當前路徑---go run 使用
+	//  範例：go run main.go -appPath ~path/project/image
+	// 	var appPath string
+	// 	flag.StringVar(&appPath, "appPath", "", "the path to the source")
+	// 	flag.Parse()
+	// 	fmt.Println(appPath)
+	//  filePath = appPath
+
+	//  判斷資料夾
+	if !IsExists(filePath) {
+		// 不存在
+		os.Mkdir(filePath, os.ModePerm)
+		fmt.Println("創建資料夾路徑為：" + filePath)
+	}
+
 	//抓取新圖片到指定目錄
 	out, err := os.Create(filePath + fileName)
 	if err != nil {
 		//沒有image資料夾
 		ShowJsonMSG(c, code.ERROR, msg.NOT_FOUND_IMAGE_FOLDER)
-		return
+		return errors.New(msg.NOT_FOUND_IMAGE_FOLDER)
 	}
 	defer out.Close()
 	_, err = io.Copy(out, file)
 	if err != nil {
 		//寫入檔案失敗
 		ShowJsonMSG(c, code.ERROR, msg.WRITE_FILE_ERROR)
-		return
+		return errors.New(msg.WRITE_FILE_ERROR)
 	}
+	return nil
 }
